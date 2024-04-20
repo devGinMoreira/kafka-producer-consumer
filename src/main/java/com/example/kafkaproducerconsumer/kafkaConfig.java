@@ -1,6 +1,7 @@
 package com.example.kafkaproducerconsumer;
 
 //import com.fasterxml.jackson.databind.JsonSerializer;
+import com.google.gson.Gson;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -21,36 +22,36 @@ import java.util.Map;
 public class kafkaConfig {
 
     @Bean
-    public ProducerFactory<String, MyModel> producerFactory(){
+    public ProducerFactory<String, String> producerFactory(){
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
         return new DefaultKafkaProducerFactory<>(config);
     }
 
     @Bean
-    public KafkaTemplate<String, MyModel> kafkaTemplate(){
+    public KafkaTemplate<String, String> kafkaTemplate(){
         return new KafkaTemplate<>(producerFactory());
     }
 
 
 //    For Kafka Consumer
     @Bean
-    public ConsumerFactory<String, MyModel> consumerFactory(){
+    public ConsumerFactory<String, String> consumerFactory(){
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "myGroupId");
 
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(MyModel.class));
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new StringDeserializer());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, MyModel> kafkaListenerContainerFactory(){
-        ConcurrentKafkaListenerContainerFactory<String, MyModel> concurrentKafkaListenerContainerFactory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(){
+        ConcurrentKafkaListenerContainerFactory<String, String> concurrentKafkaListenerContainerFactory = new ConcurrentKafkaListenerContainerFactory<>();
 
         concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
 
@@ -58,6 +59,11 @@ public class kafkaConfig {
     }
 
 
+    
+    @Bean
+    public Gson jsonConverter(){
+        return new Gson();
+    }
 
 
 
