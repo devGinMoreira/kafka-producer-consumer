@@ -2,6 +2,7 @@ package com.example.kafkaproducerconsumer;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +20,13 @@ public class KafkaController {
     @PostMapping
     public void post(@RequestBody MyModel myModel){
         kafkaTemplate.send("myTopic", myModel);
-        System.out.println(myModel);
     }
 
+
+    @KafkaListener(topics =  "myTopic")
+    public void getFromKafka(MyModel myModel){
+        System.out.println(myModel.getField1() + " : " + myModel.getField2());
+    }
 
 
 }
